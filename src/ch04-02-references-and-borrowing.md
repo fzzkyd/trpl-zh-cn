@@ -2,7 +2,7 @@
 
 > [ch04-02-references-and-borrowing.md](https://github.com/rust-lang/book/blob/master/src/ch04-02-references-and-borrowing.md)
 > <br>
-> commit a86c1d315789b3ca13b20d50ad5005c62bdd9e37
+> commit 4f19894e592cd24ac1476f1310dcf437ae83d4ba
 
 示例 4-5 中的元组代码有这样一个问题：我们必须将 `String` 返回给调用函数，以便在调用 `calculate_length` 后仍能使用 `String`，因为 `String` 被移动到了 `calculate_length` 内。
 
@@ -130,14 +130,15 @@ println!("{}, {}", r1, r2);
 
 ```text
 error[E0499]: cannot borrow `s` as mutable more than once at a time
- --> src/main.rs:5:10
+ --> src/main.rs:5:14
   |
-4 | let r1 = &mut s;
-  |          ------ first mutable borrow occurs here
-5 | let r2 = &mut s;
-  |          ^^^^^^ second mutable borrow occurs here
-6 | println!("{}, {}", r1, r2);
-  |                    -- borrow later used here
+4 |     let r1 = &mut s;
+  |              ------ first mutable borrow occurs here
+5 |     let r2 = &mut s;
+  |              ^^^^^^ second mutable borrow occurs here
+6 |
+7 |     println!("{}, {}", r1, r2);
+  |                        -- first borrow later used here
 ```
 
 这个限制允许可变性，不过是以一种受限制的方式允许。新 Rustacean 们经常与此作斗争，因为大部分语言中变量任何时候都是可变的。
@@ -168,9 +169,9 @@ let r2 = &mut s;
 ```rust,ignore,does_not_compile
 let mut s = String::from("hello");
 
-let r1 = &s; // no problem
-let r2 = &s; // no problem
-let r3 = &mut s; // BIG PROBLEM
+let r1 = &s; // 没问题
+let r2 = &s; // 没问题
+let r3 = &mut s; // 大问题
 
 println!("{}, {}, and {}", r1, r2, r3);
 ```
@@ -179,19 +180,35 @@ println!("{}, {}, and {}", r1, r2, r3);
 
 ```text
 error[E0502]: cannot borrow `s` as mutable because it is also borrowed as immutable
- --> src/main.rs:6:10
+ --> src/main.rs:6:14
   |
-4 | let r1 = &s; // no problem
-  |          -- immutable borrow occurs here
-5 | let r2 = &s; // no problem
-6 | let r3 = &mut s; // BIG PROBLEM
-  |          ^^^^^^ mutable borrow occurs here
+4 |     let r1 = &s; // no problem
+  |              -- immutable borrow occurs here
+5 |     let r2 = &s; // no problem
+6 |     let r3 = &mut s; // BIG PROBLEM
+  |              ^^^^^^ mutable borrow occurs here
 7 |
-8 | println!("{}, {}, and {}", r1, r2, r3);
-  |                            -- borrow later used here
+8 |     println!("{}, {}, and {}", r1, r2, r3);
+  |                                -- immutable borrow later used here
 ```
 
 哇哦！我们 **也** 不能在拥有不可变引用的同时拥有可变引用。不可变引用的用户可不希望在他们的眼皮底下值就被意外的改变了！然而，多个不可变引用是可以的，因为没有哪个只能读取数据的人有能力影响其他人读取到的数据。
+
+注意一个引用的作用域从声明的地方开始一直持续到最后一次使用为止。例如，因为最后一次使用不可变引用在声明可变引用之前，所以如下代码是可以编译的：
+
+```rust,edition2018,ignore
+let mut s = String::from("hello");
+
+let r1 = &s; // 没问题
+let r2 = &s; // 没问题
+println!("{} and {}", r1, r2);
+// 此位置之后 r1 和 r2 不再使用
+
+let r3 = &mut s; // 没问题
+println!("{}", r3);
+```
+
+不可变引用 `r1` 和 `r2` 的作用域在 `println!` 最后一次使用之后结束，这也是创建可变引用 `r3` 的地方。它们的作用域没有重叠，所以代码是可以编译的。
 
 尽管这些错误有时使人沮丧，但请牢记这是 Rust 编译器在提前指出一个潜在的 bug（在编译时而不是在运行时）并精准显示问题所在。这样你就不必去跟踪为何数据并不是你想象中的那样。
 
@@ -232,13 +249,14 @@ error[E0106]: missing lifetime specifier
 错误信息引用了一个我们还未介绍的功能：生命周期（lifetimes）。第十章会详细介绍生命周期。不过，如果你不理会生命周期部分，错误信息中确实包含了为什么这段代码有问题的关键信息：
 
 ```text
-this function's return type contains a borrowed value, but there is no value
-for it to be borrowed from.
+this function's return type contains a borrowed value, but there is no value for it to be borrowed from.
 ```
 
 让我们仔细看看我们的 `dangle` 代码的每一步到底发生了什么：
 
-```rust,ignore
+<span class="filename">文件名: src/main.rs</span>
+
+```rust,ignore,does_not_compile
 fn dangle() -> &String { // dangle 返回一个字符串的引用
 
     let s = String::from("hello"); // s 是一个新字符串
@@ -267,6 +285,6 @@ fn no_dangle() -> String {
 让我们概括一下之前对引用的讨论：
 
 * 在任意给定时间，**要么** 只能有一个可变引用，**要么** 只能有多个不可变引用。
-* 引用必须总是有效。
+* 引用必须总是有效的。
 
 接下来，我们来看看另一种不同类型的引用：slice。

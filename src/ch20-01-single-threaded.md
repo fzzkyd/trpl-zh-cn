@@ -2,7 +2,7 @@
 
 > [ch20-01-single-threaded.md](https://github.com/rust-lang/book/blob/master/src/ch20-01-single-threaded.md)
 > <br>
-> commit 1fedfc4b96c2017f64ecfcf41a0a07e2e815f24f
+> commit f617d58c1a88dd2912739a041fd4725d127bf9fb
 
 首先让我们创建一个可运行的单线程 web server，不过在开始之前，我们将快速了解一下构建 web server 所涉及到的协议。这些协议的细节超出了本书的范畴，不过一个简单的概括会提供我们所需的信息。
 
@@ -142,7 +142,7 @@ message-body
 
 请求行接下来的部分是 */*，它代表客户端请求的 **统一资源标识符**（*Uniform Resource Identifier*，*URI*） —— URI 大体上类似，但也不完全类似于 URL（**统一资源定位符**，*Uniform Resource Locators*）。URI 和 URL 之间的区别对于本章的目的来说并不重要，不过 HTTP 规范使用术语 URI，所以这里可以简单的将 URL 理解为 URI。
 
-最后，是客户端使用的 HTTP 版本，接着请求行以一个 **CRLF 序列**（CRLF 是**回车**，*carriage return* 和 **换行**，*line feed* 的缩写，这些术语来自打字机时代！）结尾。结尾。CRLF 序列也可以写作 `\r\n`：`\r` 是回车而 `\n` 是换行。CRLF 序列将请求行与其余的请求数据分开。注意当 CRLF 被打印时，会看到开始了一个新行而不是 `\r\n`。
+最后一部分是客户端使用的HTTP版本，然后请求行以 **CRLF序列** （CRLF代表回车和换行，*carriage return line feed*，这是打字机时代的术语！）结束。CRLF序列也可以写成`\r\n`，其中`\r`是回车符，`\n`是换行符。 CRLF序列将请求行与其余请求数据分开。 请注意，打印CRLF时，我们会看到一个新行，而不是`\r\n`。
 
 观察目前运行程序所接收到的数据的请求行，可以看到 `GET` 是 method，*/* 是请求 URI，而 `HTTP/1.1` 是版本。
 
@@ -283,7 +283,7 @@ fn handle_connection(mut stream: TcpStream) {
 }
 ```
 
-<span class="caption">示例 20-6: 匹配请求并区别处理 `/` 请求与其他请求</span>
+<span class="caption">示例 20-6: 匹配请求并区别处理 */* 请求与其他请求</span>
 
 首先，将与 */* 请求相关的数据硬编码进变量 `get`。因为我们将原始字节读取进了缓冲区，所以在 `get` 的数据开头增加 `b""` 字节字符串语法将其转换为字节字符串。接着检查 `buffer` 是否以 `get` 中的字节开头。如果是，这就是一个格式良好的 */* 请求，也就是 `if` 块中期望处理的成功情况，并会返回 HTML 文件内容的代码。
 

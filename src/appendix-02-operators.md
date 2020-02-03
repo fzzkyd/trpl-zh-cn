@@ -2,7 +2,7 @@
 
 > [appendix-02-operators.md](https://github.com/rust-lang/book/blob/master/src/appendix-02-operators.md)
 > <br />
-> commit 1fedfc4b96c2017f64ecfcf41a0a07e2e815f24f
+> commit 426f3e4ec17e539ae9905ba559411169d303a031
 
 该附录包含了 Rust 语法的词汇表，包括运算符以及其他的符号，这些符号单独出现或出现在路径、泛型、trait bounds、宏、属性、注释、元组以及大括号上下文中。
 
@@ -22,7 +22,7 @@
 | `&` | `&expr`, `&mut expr` | 借用 | |
 | `&` | `&type`, `&mut type`, `&'a type`, `&'a mut type` | 借用指针类型 |  |
 | `&` | `expr & expr` | 按位与 | `BitAnd` |
-| `&=` | `var &= expr` | 按位与与及赋值 | `BitAndAssign` |
+| `&=` | `var &= expr` | 按位与及赋值 | `BitAndAssign` |
 | `&&` | `expr && expr` | 逻辑与 |  |
 | `*` | `expr * expr` | 算术乘法 | `Mul` |
 | `*=` | `var *= expr` | 算术乘法与赋值 | `MulAssign` |
@@ -35,7 +35,7 @@
 | `-` | `- expr` | 算术取负 | `Neg` |
 | `-` | `expr - expr` | 算术减法| `Sub` |
 | `-=` | `var -= expr` | 算术减法与赋值 | `SubAssign` |
-| `->` | `fn(...) -> type`, <code>\|...\| -> type</code> | 函数与闭包，返回类型 | |
+| `->` | `fn(...) -> type`, <code>&vert;...&vert; -> type</code> | 函数与闭包，返回类型 | |
 | `.` | `expr.ident` | 成员访问 | |
 | `..` | `..`, `expr..`, `..expr`, `expr..expr` | 右排除范围 | |
 | `..` | `..expr` | 结构体更新语法 | |
@@ -62,10 +62,10 @@
 | `@` | `ident @ pat` | 模式绑定 | |
 | `^` | `expr ^ expr` | 按位异或 | `BitXor` |
 | `^=` | `var ^= expr` | 按位异或与赋值 | `BitXorAssign` |
-| <code>\|</code> | <code>pat \| pat</code> | 模式选择 | |
-| <code>\|</code> | <code>expr \| expr</code> | 按位或 | `BitOr` |
-| <code>\|=</code> | <code>var \|= expr</code> | 按位或与赋值 | `BitOrAssign` |
-| <code>\|\|</code> | <code>expr \|\| expr</code> | 逻辑或 | |
+| <code>&vert;</code> | <code>pat &vert; pat</code> | 模式选择 | |
+| <code>&vert;</code> | <code>expr &vert; expr</code> | 按位或 | `BitOr` |
+| <code>&vert;=</code> | <code>var &vert;= expr</code> | 按位或与赋值 | `BitOrAssign` |
+| <code>&vert;&vert;</code> | <code>expr &vert;&vert; expr</code> | 逻辑或 | |
 | `?` | `expr?` | 错误传播 | |
 
 ### 非运算符符号
@@ -86,7 +86,7 @@
 | `br"..."`, `br#"..."#`, `br##"..."##`, 等 | 原始字节字符串字面值，原始和字节字符串字面值的结合 |
 | `'...'` | 字符字面值 |
 | `b'...'` | ASCII 码字节字面值 |
-| <code>\|...\| expr</code> | 闭包 |
+| <code>&vert;...&vert; expr</code> | 闭包 |
 | `!` | 离散函数的总是为空的类型 |
 | `_` | “忽略” 模式绑定；也用于增强整型字面值的可读性 |
 
@@ -130,7 +130,7 @@
 |--------|-------------|
 | `T: U` | 泛型参数 `T` 约束于实现了 `U` 的类型 |
 | `T: 'a` | 泛型 `T` 的生命周期必须长于 `'a`（意味着该类型不能传递包含生命周期短于 `'a` 的任何引用）|
-| `T : 'static` | 泛型 `T` 包含了除 `'static` 之外的非借用引用 |
+| `T : 'static` | 泛型 T 不包含除 'static 之外的借用引用 |
 | `'b: 'a` | 泛型 `'b` 生命周期必须长于泛型 `'a` |
 | `T: ?Sized` | 使用一个不定大小的泛型类型 |
 | `'a + trait`, `trait + trait` | 复合类型限制 |
